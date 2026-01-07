@@ -62,6 +62,14 @@ body {
         <h2>MCQ Practice Test</h2>
         <p>Gujarati / English</p>
     </div>
+<!-- PDF Upload Section -->
+<div style="margin-bottom:20px; text-align:center;">
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="pdf" accept=".pdf" required>
+    <br><br>
+    <button type="submit" class="btn">Upload PDF</button>
+  </form>
+</div>
 
     <div class="question"></div>
 
