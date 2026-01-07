@@ -2,53 +2,88 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MCQ Practice App</title>
+    <title>MCQ Practice</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #f4f6f8;
-            padding: 40px;
+            background: #f2f4f8;
+            margin: 0;
+            padding: 0;
         }
-        .box {
-            background: white;
-            padding: 25px;
-            max-width: 600px;
-            margin: auto;
-            border-radius: 8px;
+
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #333;
+        }
+
+        .question {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
         .option {
             margin: 10px 0;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
         }
-        button {
-            margin-top: 20px;
-            padding: 10px 20px;
+
+        .option:hover {
+            background: #f0f0f0;
+        }
+
+        .btn {
+            margin-top: 25px;
+            padding: 12px;
+            width: 100%;
             font-size: 16px;
+            background: #2e86de;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #1b4f72;
         }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h2>Question 1</h2>
-    <p>What is the capital of India?</p>
+<div class="container">
+    <div class="header">
+        <h1>MCQ Practice Test</h1>
+        <p>Gujarati / English MCQs</p>
+    </div>
 
-    <form>
-        <div class="option">
-            <input type="radio" name="ans"> Delhi
-        </div>
-        <div class="option">
-            <input type="radio" name="ans"> Mumbai
-        </div>
-        <div class="option">
-            <input type="radio" name="ans"> Chennai
-        </div>
-        <div class="option">
-            <input type="radio" name="ans"> Kolkata
-        </div>
+    <div class="question">
+        Q1. What is the capital of India?
+    </div>
 
-        <button type="button">Next</button>
-    </form>
+    <div class="option">A. Delhi</div>
+    <div class="option">B. Mumbai</div>
+    <div class="option">C. Chennai</div>
+    <div class="option">D. Kolkata</div>
+
+    <button class="btn">Next Question</button>
 </div>
 
 </body>
 </html>
+
