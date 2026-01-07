@@ -1,89 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>MCQ Practice</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f2f4f8;
-            margin: 0;
-            padding: 0;
-        }
+<meta charset="UTF-8">
+<title>MCQ Practice App</title>
 
-        .container {
-            max-width: 700px;
-            margin: 40px auto;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+}
 
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
+.container {
+    max-width: 500px;
+    margin: 50px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+}
 
-        .header h1 {
-            margin: 0;
-            color: #333;
-        }
+.header {
+    text-align: center;
+}
 
-        .question {
-            font-size: 20px;
-            margin-bottom: 20px;
-        }
+.question {
+    font-size: 18px;
+    margin: 20px 0;
+}
 
-        .option {
-            margin: 10px 0;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            cursor: pointer;
-        }
+.option {
+    padding: 10px;
+    margin: 8px 0;
+    background: #eee;
+    cursor: pointer;
+    border-radius: 5px;
+}
 
-        .option:hover {
-            background: #f0f0f0;
-        }
+.option:hover {
+    background: #ddd;
+}
 
-        .btn {
-            margin-top: 25px;
-            padding: 12px;
-            width: 100%;
-            font-size: 16px;
-            background: #2e86de;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
+.btn {
+    margin-top: 15px;
+    width: 100%;
+    padding: 10px;
+    background: #1b4f72;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
 
-        .btn:hover {
-            background: #1b4f72;
-        }
-    </style>
+.btn:hover {
+    background: #21618c;
+}
+</style>
 </head>
-<body>
 
+<body>
 <div class="container">
     <div class="header">
-        <h1>MCQ Practice Test</h1>
-        <p>Gujarati / English MCQs</p>
+        <h2>MCQ Practice Test</h2>
+        <p>Gujarati / English</p>
     </div>
 
-    <div class="question">
-        Q1. What is the capital of India?
-    </div>
+    <div class="question"></div>
 
-    <div class="option">A. Delhi</div>
-    <div class="option">B. Mumbai</div>
-    <div class="option">C. Chennai</div>
-    <div class="option">D. Kolkata</div>
+    <div class="option"></div>
+    <div class="option"></div>
+    <div class="option"></div>
+    <div class="option"></div>
 
     <button class="btn">Next Question</button>
 </div>
 
+<script>
+const questions = [
+    {
+        question: "What is the capital of India?",
+        options: ["Delhi", "Mumbai", "Chennai", "Kolkata"],
+        answer: "Delhi"
+    },
+    {
+        question: "ગુજરાતની રાજધાની શું છે?",
+        options: ["દિલ્હી", "મુંબઈ", "ગાંધીનગર", "સુરત"],
+        answer: "ગાંધીનગર"
+    }
+];
+
+let currentIndex = 0;
+let score = 0;
+
+const questionDiv = document.querySelector(".question");
+const optionDivs = document.querySelectorAll(".option");
+const nextBtn = document.querySelector(".btn");
+
+function loadQuestion() {
+    const q = questions[currentIndex];
+    questionDiv.innerText = `Q${currentIndex + 1}. ${q.question}`;
+
+    optionDivs.forEach((div, i) => {
+        div.innerText = q.options[i];
+        div.style.background = "#eee";
+        div.onclick = () => checkAnswer(div);
+    });
+}
+
+function checkAnswer(selected) {
+    const correct = questions[currentIndex].answer;
+    optionDivs.forEach(div => div.onclick = null);
+
+    if (selected.innerText === correct) {
+        selected.style.background = "lightgreen";
+        score++;
+    } else {
+        selected.style.background = "#ffb3b3";
+        optionDivs.forEach(div => {
+            if (div.innerText === correct) {
+                div.style.background = "lightgreen";
+            }
+        });
+    }
+}
+
+nextBtn.onclick = () => {
+    currentIndex++;
+    if (currentIndex < questions.length) {
+        loadQuestion();
+    } else {
+        questionDiv.innerText = `Test Finished 🎉 Score: ${score}/${questions.length}`;
+        optionDivs.forEach(div => div.style.display = "none");
+        nextBtn.style.display = "none";
+    }
+};
+
+loadQuestion();
+</script>
 </body>
 </html>
+
 
