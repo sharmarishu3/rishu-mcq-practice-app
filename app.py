@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 questions = [
 
-    # ---------- ENGLISH MCQs (10) ----------
+    # ---------- ENGLISH MCQs (20) ----------
     {
         "question": "What is the capital of India?",
         "options": ["Delhi", "Mumbai", "Chennai", "Kolkata"],
@@ -57,7 +57,58 @@ questions = [
         "answer": "26"
     },
 
-    # ---------- GUJARATI MCQs (10) ----------
+    {
+        "question": "Who was the first President of India?",
+        "options": ["Rajendra Prasad", "Jawaharlal Nehru", "Sardar Patel", "APJ Abdul Kalam"],
+        "answer": "Rajendra Prasad"
+    },
+    {
+        "question": "Which is the largest ocean in the world?",
+        "options": ["Atlantic", "Indian", "Pacific", "Arctic"],
+        "answer": "Pacific"
+    },
+    {
+        "question": "Which continent is India located in?",
+        "options": ["Europe", "Asia", "Africa", "Australia"],
+        "answer": "Asia"
+    },
+    {
+        "question": "Which month has 28 days in a normal year?",
+        "options": ["January", "February", "March", "April"],
+        "answer": "February"
+    },
+    {
+        "question": "Which instrument is used to measure temperature?",
+        "options": ["Barometer", "Thermometer", "Hygrometer", "Altimeter"],
+        "answer": "Thermometer"
+    },
+    {
+        "question": "Which bird cannot fly?",
+        "options": ["Sparrow", "Eagle", "Ostrich", "Crow"],
+        "answer": "Ostrich"
+    },
+    {
+        "question": "Which is the national flower of India?",
+        "options": ["Rose", "Lotus", "Lily", "Sunflower"],
+        "answer": "Lotus"
+    },
+    {
+        "question": "Which metal is liquid at room temperature?",
+        "options": ["Iron", "Gold", "Mercury", "Silver"],
+        "answer": "Mercury"
+    },
+    {
+        "question": "Which day is celebrated as Independence Day in India?",
+        "options": ["26 January", "15 August", "2 October", "1 May"],
+        "answer": "15 August"
+    },
+    {
+        "question": "How many colors are there in a rainbow?",
+        "options": ["5", "6", "7", "8"],
+        "answer": "7"
+    },
+
+    # ---------- GUJARATI MCQs (20) ----------
     {
         "question": "ભારતની રાજધાની શું છે?",
         "options": ["દિલ્લી", "મુંબઈ", "ચેન્નઈ", "કોલકાતા"],
@@ -107,6 +158,57 @@ questions = [
         "question": "ગુજરાત ભારતના કયા ભાગમાં આવેલું છે?",
         "options": ["ઉત્તર", "દક્ષિણ", "પૂર્વ", "પશ્ચિમ"],
         "answer": "પશ્ચિમ"
+    },
+
+    {
+        "question": "ભારતનો રાષ્ટ્રધ્વજ કેટલા રંગનો છે?",
+        "options": ["2", "3", "4", "5"],
+        "answer": "3"
+    },
+    {
+        "question": "ભારતનો રાષ્ટ્રીય પક્ષી કયું છે?",
+        "options": ["કબૂતર", "મોર", "કાગડો", "ચકલી"],
+        "answer": "મોર"
+    },
+    {
+        "question": "ગુજરાતનું રાજ્ય ફૂલ કયું છે?",
+        "options": ["ગુલાબ", "લોટસ", "મેરિગોલ્ડ", "સૂર્યમુખી"],
+        "answer": "લોટસ"
+    },
+    {
+        "question": "ગુજરાતનો સૌથી મોટો જિલ્લો કયો છે?",
+        "options": ["કચ્છ", "અમદાવાદ", "સુરત", "વડોદરા"],
+        "answer": "કચ્છ"
+    },
+    {
+        "question": "ભારતની સ્વતંત્રતા ક્યારે મળી?",
+        "options": ["1942", "1945", "1947", "1950"],
+        "answer": "1947"
+    },
+    {
+        "question": "વિશ્વ પર્યાવરણ દિવસ ક્યારે ઉજવાય છે?",
+        "options": ["5 જૂન", "10 જુલાઈ", "15 ઓગસ્ટ", "2 ઑક્ટોબર"],
+        "answer": "5 જૂન"
+    },
+    {
+        "question": "ગુજરાતની રાજ્ય ભાષા કઈ છે?",
+        "options": ["હિન્દી", "મરાઠી", "ગુજરાતી", "ઉર્દૂ"],
+        "answer": "ગુજરાતી"
+    },
+    {
+        "question": "ભારતનું રાષ્ટ્રીય ફળ કયું છે?",
+        "options": ["કેળું", "સફરજન", "આમ", "નારંગી"],
+        "answer": "આમ"
+    },
+    {
+        "question": "વિશ્વનું સૌથી મોટું ખંડ કયું છે?",
+        "options": ["યુરોપ", "આફ્રિકા", "એશિયા", "ઑસ્ટ્રેલિયા"],
+        "answer": "એશિયા"
+    },
+    {
+        "question": "ભારતની રાષ્ટ્રીય રમત કઈ છે?",
+        "options": ["ક્રિકેટ", "ફૂટબોલ", "હોકી", "કબડ્ડી"],
+        "answer": "હોકી"
     }
 
 ]
