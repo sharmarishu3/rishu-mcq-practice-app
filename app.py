@@ -10,11 +10,13 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
 def extract_first_mcq(pdf_path):
+    text = ""
+
     with pdfplumber.open(pdf_path) as pdf:
-        text = ""
         for page in pdf.pages:
-            if page.extract_text():
-                text += page.extract_text() + "\n"
+            page_text = page.extract_text()
+            if page_text:
+                text += page_text + "\n"
 
     pattern = re.compile(
         r"\d+\.\s*(.*?)\n"
@@ -29,11 +31,11 @@ def extract_first_mcq(pdf_path):
 
     if match:
         return {
-            "question": match.group(1),
-            "a": match.group(2),
-            "b": match.group(3),
-            "c": match.group(4),
-            "d": match.group(5)
+            "question": match.group(1).strip(),
+            "a": match.group(2).strip(),
+            "b": match.group(3).strip(),
+            "c": match.group(4).strip(),
+            "d": match.group(5).strip(),
         }
 
     return None
@@ -44,14 +46,15 @@ def index():
     mcq = None
 
     if request.method == "POST":
-        pdf = request.files["pdf"]
-        path = os.path.join(UPLOAD_FOLDER, pdf.filename)
-        pdf.save(path)
-
-        mcq = extract_first_mcq(path)
+        pdf = request.files.get("pdf")
+        if pdf:
+            file_path = os.path.join(UPLOAD_FOLDER, pdf.filename)
+            pdf.save(file_path)
+            mcq = extract_first_mcq(file_path)
 
     return render_template("index.html", mcq=mcq)
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
