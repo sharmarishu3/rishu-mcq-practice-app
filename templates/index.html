@@ -1,149 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>MCQ Practice App</title>
-
-<style>
-body {
-    font-family: Arial, sans-serif;
-    background: #f4f6f8;
-}
-
-.container {
-    max-width: 500px;
-    margin: 50px auto;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-}
-
-.header {
-    text-align: center;
-}
-
-.question {
-    font-size: 18px;
-    margin: 20px 0;
-}
-
-.option {
-    padding: 10px;
-    margin: 8px 0;
-    background: #eee;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.option:hover {
-    background: #ddd;
-}
-
-.btn {
-    margin-top: 15px;
-    width: 100%;
-    padding: 10px;
-    background: #1b4f72;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.btn:hover {
-    background: #21618c;
-}
-</style>
+    <title>MCQ Practice</title>
+    <style>
+        body { font-family: Arial; background:#f4f6f8; }
+        .box { width:400px; margin:50px auto; background:white; padding:20px; border-radius:8px; }
+        .option { background:#eee; padding:10px; margin:8px 0; cursor:pointer; border-radius:5px; }
+        .btn { width:100%; padding:10px; background:#1b4f72; color:white; border:none; cursor:pointer; }
+    </style>
 </head>
-
 <body>
-<div class="container">
-    <div class="header">
-        <h2>MCQ Practice Test</h2>
-        <p>Gujarati / English</p>
-    </div>
-<!-- PDF Upload Section -->
-<div style="margin-bottom:20px; text-align:center;">
-  <form action="/upload" method="post" enctype="multipart/form-data">
-    <input type="file" name="pdf" accept=".pdf" required>
-    <br><br>
-    <button type="submit" class="btn">Upload PDF</button>
-  </form>
-</div>
 
-    <div class="question"></div>
+<div class="box">
+    <h3 id="question"></h3>
 
     <div class="option"></div>
     <div class="option"></div>
     <div class="option"></div>
     <div class="option"></div>
 
-    <button class="btn">Next Question</button>
+    <button class="btn" id="nextBtn">Next Question</button>
 </div>
 
 <script>
-const questions = [
-    {
-        question: "What is the capital of India?",
-        options: ["Delhi", "Mumbai", "Chennai", "Kolkata"],
-        answer: "Delhi"
-    },
-    {
-        question: "ગુજરાતની રાજધાની શું છે?",
-        options: ["દિલ્હી", "મુંબઈ", "ગાંધીનગર", "સુરત"],
-        answer: "ગાંધીનગર"
-    }
+let questions = [
+  {
+    question: "20वीं सदी का सबसे बड़ा युद्ध कौन सा था?",
+    options: ["प्रथम विश्व युद्ध", "द्वितीय विश्व युद्ध", "शीत युद्ध", "कोई नहीं"],
+    answer: "द्वितीय विश्व युद्ध"
+  },
+  {
+    question: "भारत की राजधानी क्या है?",
+    options: ["दिल्ली", "मुंबई", "चेन्नई", "कोलकाता"],
+    answer: "दिल्ली"
+  }
 ];
 
-let currentIndex = 0;
+let index = 0;
 let score = 0;
 
-const questionDiv = document.querySelector(".question");
-const optionDivs = document.querySelectorAll(".option");
-const nextBtn = document.querySelector(".btn");
+const q = document.getElementById("question");
+const options = document.querySelectorAll(".option");
+const nextBtn = document.getElementById("nextBtn");
 
-function loadQuestion() {
-    const q = questions[currentIndex];
-    questionDiv.innerText = `Q${currentIndex + 1}. ${q.question}`;
-
-    optionDivs.forEach((div, i) => {
-        div.innerText = q.options[i];
-        div.style.background = "#eee";
-        div.onclick = () => checkAnswer(div);
+function load() {
+    q.innerText = questions[index].question;
+    options.forEach((o,i)=>{
+        o.innerText = questions[index].options[i];
+        o.style.background="#eee";
+        o.onclick = ()=>check(o);
     });
 }
 
-function checkAnswer(selected) {
-    const correct = questions[currentIndex].answer;
-    optionDivs.forEach(div => div.onclick = null);
-
-    if (selected.innerText === correct) {
-        selected.style.background = "lightgreen";
+function check(selected){
+    options.forEach(o=>o.onclick=null);
+    if(selected.innerText === questions[index].answer){
+        selected.style.background="lightgreen";
         score++;
     } else {
-        selected.style.background = "#ffb3b3";
-        optionDivs.forEach(div => {
-            if (div.innerText === correct) {
-                div.style.background = "lightgreen";
-            }
-        });
+        selected.style.background="#ffb3b3";
     }
 }
 
-nextBtn.onclick = () => {
-    currentIndex++;
-    if (currentIndex < questions.length) {
-        loadQuestion();
+nextBtn.onclick = ()=>{
+    index++;
+    if(index < questions.length){
+        load();
     } else {
-        questionDiv.innerText = `Test Finished 🎉 Score: ${score}/${questions.length}`;
-        optionDivs.forEach(div => div.style.display = "none");
-        nextBtn.style.display = "none";
+        q.innerText = "Test Finished 🎉 Score: "+score+"/"+questions.length;
+        options.forEach(o=>o.style.display="none");
+        nextBtn.style.display="none";
     }
-};
+}
 
-loadQuestion();
+load();
 </script>
+
 </body>
 </html>
-
-
