@@ -3,30 +3,77 @@
 <head>
     <title>MCQ Test</title>
     <style>
-        body { font-family: Arial; background:#f0f0f0; }
-        .box { width:600px; margin:50px auto; background:white; padding:20px; border-radius:10px; }
-        button { width:100%; padding:10px; margin-top:10px; }
+        body { font-family: Arial; background:#f2f2f2; }
+        .box {
+            width: 500px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .option {
+            padding: 10px;
+            background: #eee;
+            margin: 8px 0;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .correct { background: #9cff9c; }
+        .wrong { background: #ff9c9c; }
     </style>
 </head>
 <body>
 
 <div class="box">
-{% if finished %}
-    <h2>Test Finished 🎉</h2>
-    <h3>Score: {{ score }} / {{ total }}</h3>
-    <h3>Percentage: {{ (score/total*100)|round(2) }}%</h3>
-    <a href="/restart"><button>Restart</button></a>
-{% else %}
-    <h3>Question {{ index }} / {{ total }}</h3>
-    <p><b>{{ q.question }}</b></p>
-
-    <form method="post">
-        {% for opt in q.options %}
-            <button name="option" value="{{ opt }}">{{ opt }}</button>
-        {% endfor %}
-    </form>
-{% endif %}
+    <h3 id="q"></h3>
+    <div id="options"></div>
+    <button onclick="next()">Next</button>
+    <p id="score"></p>
 </div>
+
+<script>
+    const questions = {{ questions|tojson }};
+    let index = 0;
+    let score = 0;
+
+    function load() {
+        document.getElementById("score").innerText = "";
+        let q = questions[index];
+        document.getElementById("q").innerText =
+            `Q${index+1}. ${q.question}`;
+
+        let html = "";
+        q.options.forEach(o => {
+            html += `<div class="option" onclick="check(this)">${o}</div>`;
+        });
+        document.getElementById("options").innerHTML = html;
+    }
+
+    function check(el) {
+        let ans = questions[index].answer;
+        if (el.innerText === ans) {
+            el.classList.add("correct");
+            score++;
+        } else {
+            el.classList.add("wrong");
+        }
+        document.querySelectorAll(".option").forEach(o => o.onclick = null);
+    }
+
+    function next() {
+        index++;
+        if (index < questions.length) {
+            load();
+        } else {
+            document.getElementById("q").innerText = "Test Finished";
+            document.getElementById("options").innerHTML = "";
+            document.getElementById("score").innerText =
+                `Score: ${score} / ${questions.length}`;
+        }
+    }
+
+    load();
+</script>
 
 </body>
 </html>
