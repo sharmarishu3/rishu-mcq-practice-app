@@ -7,56 +7,51 @@ app = Flask(__name__)
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 
-def extract_mcqs(text):
-    mcqs = []
+def extract_first_mcq(pdf_path):
+    with pdfplumber.open(pdf_path) as pdf:
+        text = ""
+        for page in pdf.pages:
+            if page.extract_text():
+                text += page.extract_text() + "\n"
 
-    # Question pattern (1. question)
-    question_blocks = re.split(r"\n\s*\d+\.\s*", text)
+    pattern = re.compile(
+        r"\d+\.\s*(.*?)\n"
+        r"\(a\)\s*(.*?)\n"
+        r"\(b\)\s*(.*?)\n"
+        r"\(c\)\s*(.*?)\n"
+        r"\(d\)\s*(.*?)\n",
+        re.DOTALL
+    )
 
-    for block in question_blocks[1:3]:  # sirf 1–2 MCQ test ke liye
-        lines = block.strip().split("\n")
+    match = pattern.search(text)
 
-        question = lines[0]
+    if match:
+        return {
+            "question": match.group(1),
+            "a": match.group(2),
+            "b": match.group(3),
+            "c": match.group(4),
+            "d": match.group(5)
+        }
 
-        options = []
-        for line in lines[1:]:
-            if re.match(r"\([a-d]\)", line.lower()):
-                options.append(line)
-
-        if len(options) >= 4:
-            mcqs.append({
-                "question": question,
-                "options": options[:4]
-            })
-
-    return mcqs
+    return None
 
 
 @app.route("/", methods=["GET", "POST"])
-def home():
-    mcqs = []
+def index():
+    mcq = None
 
     if request.method == "POST":
-        pdf = request.files.get("pdf")
-        if pdf:
-            pdf_path = os.path.join(app.config["UPLOAD_FOLDER"], pdf.filename)
-            pdf.save(pdf_path)
+        pdf = request.files["pdf"]
+        path = os.path.join(UPLOAD_FOLDER, pdf.filename)
+        pdf.save(path)
 
-            full_text = ""
-            with pdfplumber.open(pdf_path) as pdf_file:
-                for page in pdf_file.pages:
-                    text = page.extract_text()
-                    if text:
-                        full_text += text + "\n"
+        mcq = extract_first_mcq(path)
 
-            mcqs = extract_mcqs(full_text)
-
-    return render_template("index.html", mcqs=mcqs)
+    return render_template("index.html", mcq=mcq)
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(debug=True)
