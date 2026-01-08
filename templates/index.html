@@ -5,26 +5,26 @@
     <style>
         body {
             font-family: Arial;
-            background: #f4f4f4;
+            background: #f2f2f2;
         }
         .box {
             width: 400px;
             background: white;
             margin: 50px auto;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 8px;
         }
         .option {
-            background: #eee;
             padding: 10px;
             margin: 8px 0;
+            background: #eee;
             cursor: pointer;
             border-radius: 5px;
         }
         .btn {
             width: 100%;
             padding: 10px;
-            margin-top: 10px;
+            margin-top: 15px;
             cursor: pointer;
         }
     </style>
@@ -32,58 +32,73 @@
 <body>
 
 <div class="box">
-    <h3 id="q"></h3>
-    <div id="opts"></div>
-    <button class="btn" id="nextBtn">Next</button>
-    <p id="result"></p>
+    <h3 id="qno"></h3>
+    <h2 id="question"></h2>
+    <div id="options"></div>
+    <button class="btn" onclick="nextQuestion()">Next</button>
 </div>
 
 <script>
     const questions = {{ questions | tojson }};
     let index = 0;
     let score = 0;
-
-    const q = document.getElementById("q");
-    const opts = document.getElementById("opts");
-    const nextBtn = document.getElementById("nextBtn");
-    const result = document.getElementById("result");
+    let answered = false;
 
     function loadQuestion() {
-        q.innerText = (index + 1) + ". " + questions[index].question;
-        opts.innerHTML = "";
+        answered = false;
+        document.getElementById("qno").innerText =
+            "Question " + (index + 1) + " / " + questions.length;
+
+        document.getElementById("question").innerText =
+            questions[index].question;
+
+        let optionsDiv = document.getElementById("options");
+        optionsDiv.innerHTML = "";
+
         questions[index].options.forEach(opt => {
-            const div = document.createElement("div");
+            let div = document.createElement("div");
             div.className = "option";
             div.innerText = opt;
             div.onclick = () => checkAnswer(div, opt);
-            opts.appendChild(div);
+            optionsDiv.appendChild(div);
         });
     }
 
-    function checkAnswer(div, opt) {
-        if (opt === questions[index].answer) {
-            div.style.background = "lightgreen";
-            score++;
-        } else {
-            div.style.background = "#ffb3b3";
-        }
-        document.querySelectorAll(".option").forEach(o => o.onclick = null);
+    function checkAnswer(div, selected) {
+        if (answered) return;
+        answered = true;
+
+        let correct = questions[index].answer;
+        let options = document.querySelectorAll(".option");
+
+        options.forEach(o => {
+            if (o.innerText === correct) {
+                o.style.background = "lightgreen";
+            }
+            if (o.innerText === selected && selected !== correct) {
+                o.style.background = "#ffb3b3";
+            }
+        });
+
+        if (selected === correct) score++;
     }
 
-    nextBtn.onclick = () => {
+    function nextQuestion() {
+        if (!answered) return alert("Answer select karo");
+
         index++;
+
         if (index < questions.length) {
             loadQuestion();
         } else {
-            q.innerText = "Test Finished";
-            opts.innerHTML = "";
-            result.innerText =
-                "Score: " + score + "/" + questions.length +
-                " (" + Math.round((score / questions.length) * 100) + "%)";
-            nextBtn.innerText = "Restart";
-            nextBtn.onclick = () => location.reload();
+            document.querySelector(".box").innerHTML = `
+                <h2>Test Finished</h2>
+                <h3>Score: ${score} / ${questions.length}</h3>
+                <h3>Percentage: ${(score / questions.length * 100).toFixed(2)}%</h3>
+                <button class="btn" onclick="location.reload()">Restart</button>
+            `;
         }
-    };
+    }
 
     loadQuestion();
 </script>
