@@ -1,49 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>MCQ PDF Reader</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: #f2f2f2;
-            padding: 40px;
-        }
-        .box {
-            background: white;
-            padding: 20px;
-            max-width: 800px;
-            margin: auto;
-            border-radius: 8px;
-        }
-        .question {
-            margin-top: 20px;
-            font-weight: bold;
-        }
-        .option {
-            margin-left: 20px;
-        }
-    </style>
+    <title>First MCQ Extractor</title>
 </head>
 <body>
 
-<div class="box">
-    <h2>Upload MCQ PDF</h2>
+<h2>Upload MCQ PDF</h2>
 
-    <form method="POST" enctype="multipart/form-data">
-        <input type="file" name="pdf" required>
-        <br><br>
-        <button type="submit">Upload & Extract MCQ</button>
-    </form>
+<form method="POST" enctype="multipart/form-data">
+    <input type="file" name="pdf" required>
+    <button type="submit">Upload</button>
+</form>
 
-    {% for mcq in mcqs %}
-        <div class="question">
-            Q: {{ mcq.question }}
-        </div>
-        {% for opt in mcq.options %}
-            <div class="option">{{ opt }}</div>
-        {% endfor %}
-    {% endfor %}
-</div>
+<hr>
+
+{% if mcq %}
+    <h3>First Question</h3>
+    <p><b>Q.</b> {{ mcq.question }}</p>
+    <p>(a) {{ mcq.a }}</p>
+    <p>(b) {{ mcq.b }}</p>
+    <p>(c) {{ mcq.c }}</p>
+    <p>(d) {{ mcq.d }}</p>
+{% else %}
+    <p>No MCQ found yet.</p>
+{% endif %}
 
 </body>
 </html>
