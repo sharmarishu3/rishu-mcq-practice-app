@@ -1,33 +1,70 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>MCQ Test</title>
-<style>
-.option{padding:10px;margin:8px;background:#eee;cursor:pointer}
-.correct{background:#90ee90}
-.wrong{background:#ff9999}
-</style>
+    <title>MCQ Quiz</title>
+    <style>
+        button { display:block; margin:10px; padding:10px }
+        .correct { background:green; color:white }
+        .wrong { background:red; color:white }
+    </style>
 </head>
-<body style="text-align:center;margin-top:60px">
+<body>
 
-{% if finished %}
-<h2>Result</h2>
-<p>Total: {{total}}</p>
-<p>Correct: {{correct}}</p>
-<p>Wrong: {{wrong}}</p>
-<p>Accuracy: {{accuracy}}%</p>
-<a href="/"><button>Restart</button></a>
+<h3 id="qno"></h3>
+<h2 id="question"></h2>
+<div id="options"></div>
 
-{% else %}
-<h3>Question {{index}} / {{total}}</h3>
-<p><b>{{q.question}}</b></p>
+<script>
+let current = 0;
 
-<form method="post">
-{% for opt in q.options %}
-<button class="option" name="option" value="{{opt}}">{{opt}}</button><br>
-{% endfor %}
-</form>
-{% endif %}
+function loadQuestion(){
+    fetch("/next", {method:"POST"})
+    .then(res=>res.json())
+    .then(data=>{
+        if(data.done){
+            fetch("/result").then(r=>r.json()).then(r=>{
+                document.body.innerHTML = `
+                <h2>Result</h2>
+                <p>Total: ${r.total}</p>
+                <p>Correct: ${r.correct}</p>
+                <p>Wrong: ${r.wrong}</p>
+                <p>Accuracy: ${r.accuracy}%</p>
+                `;
+            })
+            return;
+        }
+        document.getElementById("qno").innerText =
+            `Question ${data.index+1} / ${data.total}`;
+        document.getElementById("question").innerText = data.question;
+
+        let div = document.getElementById("options");
+        div.innerHTML = "";
+        ["a","b","c","d"].forEach((o,i)=>{
+            let btn = document.createElement("button");
+            btn.innerText = data.options[i];
+            btn.onclick = ()=>check(o,btn);
+            div.appendChild(btn);
+        });
+    })
+}
+
+function check(opt,btn){
+    fetch("/check",{
+        method:"POST",
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({selected:opt})
+    }).then(res=>res.json()).then(r=>{
+        if(r.correct){
+            btn.classList.add("correct");
+        }else{
+            btn.classList.add("wrong");
+        }
+        setTimeout(loadQuestion,800);
+    })
+}
+
+loadQuestion();
+</script>
 
 </body>
 </html>
