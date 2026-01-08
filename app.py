@@ -5,29 +5,19 @@ app = Flask(__name__)
 
 questions = [
     {
-        "question": "What is the capital of India?",
-        "options": ["Delhi", "Mumbai", "Chennai", "Kolkata"],
-        "answer": "Delhi"
+        "question": "20वीं सदी का सबसे बड़ा युद्ध कौन सा था?",
+        "options": ["प्रथम विश्व युद्ध", "द्वितीय विश्व युद्ध", "शीत युद्ध", "कोई नहीं"],
+        "answer": "द्वितीय विश्व युद्ध"
     },
     {
-        "question": "ભારતની રાજધાની શું છે?",
-        "options": ["દિલ્લી", "મુંબઈ", "ચેન્નઈ", "કોલકાતા"],
-        "answer": "દિલ્લી"
+        "question": "भारत की राजधानी क्या है?",
+        "options": ["दिल्ली", "मुंबई", "चेन्नई", "कोलकाता"],
+        "answer": "दिल्ली"
     },
     {
-        "question": "Gujarat ni rajdhani shu chhe?",
-        "options": ["Surat", "Rajkot", "Gandhinagar", "Ahmedabad"],
-        "answer": "Gandhinagar"
-    },
-    {
-        "question": "2 + 2 = ?",
-        "options": ["3", "4", "5", "6"],
-        "answer": "4"
-    },
-    {
-        "question": "Sun rises in the?",
-        "options": ["North", "South", "East", "West"],
-        "answer": "East"
+        "question": "गुजरात की राजधानी क्या है?",
+        "options": ["सूरत", "राजकोट", "गांधीनगर", "अहमदाबाद"],
+        "answer": "गांधीनगर"
     }
 ]
 
