@@ -1,60 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>MCQ Test</title>
-    <script>
-        let index = 0;
-        let score = 0;
-        let questions = {{ questions | tojson }};
-
-        function loadQuestion() {
-            document.getElementById("q").innerText =
-                (index + 1) + ". " + questions[index].question;
-
-            let opts = document.getElementsByClassName("opt");
-            for (let i = 0; i < 4; i++) {
-                opts[i].innerText = questions[index].options[i];
-                opts[i].style.background = "#eee";
-            }
-        }
-
-        function checkAnswer(btn) {
-            if (btn.innerText === questions[index].answer) {
-                btn.style.background = "lightgreen";
-                score++;
-            } else {
-                btn.style.background = "#ffb3b3";
-            }
-        }
-
-        function nextQ() {
-            index++;
-            if (index < questions.length) {
-                loadQuestion();
-            } else {
-                document.body.innerHTML =
-                    "<h2>Test Finished</h2>" +
-                    "<h3>Score: " + score + "/" + questions.length + "</h3>" +
-                    "<button onclick='location.reload()'>Restart</button>";
-            }
-        }
-
-        window.onload = loadQuestion;
-    </script>
+<title>MCQ Test</title>
+<style>
+.option{padding:10px;margin:8px;background:#eee;cursor:pointer}
+.correct{background:#90ee90}
+.wrong{background:#ff9999}
+</style>
 </head>
+<body style="text-align:center;margin-top:60px">
 
-<body style="text-align:center;margin-top:100px">
+{% if finished %}
+<h2>Result</h2>
+<p>Total: {{total}}</p>
+<p>Correct: {{correct}}</p>
+<p>Wrong: {{wrong}}</p>
+<p>Accuracy: {{accuracy}}%</p>
+<a href="/"><button>Restart</button></a>
 
-<h2 id="q"></h2>
+{% else %}
+<h3>Question {{index}} / {{total}}</h3>
+<p><b>{{q.question}}</b></p>
 
-<div>
-    <button class="opt" onclick="checkAnswer(this)"></button><br><br>
-    <button class="opt" onclick="checkAnswer(this)"></button><br><br>
-    <button class="opt" onclick="checkAnswer(this)"></button><br><br>
-    <button class="opt" onclick="checkAnswer(this)"></button><br><br>
-</div>
-
-<button onclick="nextQ()">Next</button>
+<form method="post">
+{% for opt in q.options %}
+<button class="option" name="option" value="{{opt}}">{{opt}}</button><br>
+{% endfor %}
+</form>
+{% endif %}
 
 </body>
 </html>
