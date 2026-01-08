@@ -1,80 +1,76 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>MCQ Practice</title>
-    <style>
-        body { font-family: Arial; background:#f4f6f8; }
-        .box { width:400px; margin:50px auto; background:white; padding:20px; border-radius:8px; }
-        .option { background:#eee; padding:10px; margin:8px 0; cursor:pointer; border-radius:5px; }
-        .btn { width:100%; padding:10px; background:#1b4f72; color:white; border:none; cursor:pointer; }
-    </style>
+<title>MCQ Practice</title>
+<style>
+body { font-family: Arial; background:#f4f6f8; }
+.box { width:400px; margin:50px auto; background:white; padding:20px; border-radius:8px; }
+.option { background:#eee; padding:10px; margin:8px 0; cursor:pointer; border-radius:5px; }
+.option:hover { background:#ddd; }
+.correct { background:lightgreen; }
+.wrong { background:#ffb3b3; }
+button { width:100%; padding:10px; margin-top:10px; }
+</style>
 </head>
+
 <body>
-
 <div class="box">
-    <h3 id="question"></h3>
+<h3 id="q"></h3>
 
-    <div class="option"></div>
-    <div class="option"></div>
-    <div class="option"></div>
-    <div class="option"></div>
+<div class="option"></div>
+<div class="option"></div>
+<div class="option"></div>
+<div class="option"></div>
 
-    <button class="btn" id="nextBtn">Next Question</button>
+<button onclick="next()">Next</button>
 </div>
 
 <script>
 let questions = [
-  {
-    question: "20वीं सदी का सबसे बड़ा युद्ध कौन सा था?",
-    options: ["प्रथम विश्व युद्ध", "द्वितीय विश्व युद्ध", "शीत युद्ध", "कोई नहीं"],
-    answer: "द्वितीय विश्व युद्ध"
-  },
-  {
-    question: "भारत की राजधानी क्या है?",
-    options: ["दिल्ली", "मुंबई", "चेन्नई", "कोलकाता"],
-    answer: "दिल्ली"
-  }
+ {
+  q:"भारत की राजधानी क्या है?",
+  o:["दिल्ली","मुंबई","चेन्नई","कोलकाता"],
+  a:"दिल्ली"
+ },
+ {
+  q:"20वीं सदी का सबसे बड़ा युद्ध कौन सा था?",
+  o:["प्रथम","द्वितीय","शीत","कोई नहीं"],
+  a:"द्वितीय"
+ }
 ];
 
-let index = 0;
-let score = 0;
+let i=0, score=0;
+let q=document.getElementById("q");
+let ops=document.querySelectorAll(".option");
 
-const q = document.getElementById("question");
-const options = document.querySelectorAll(".option");
-const nextBtn = document.getElementById("nextBtn");
-
-function load() {
-    q.innerText = questions[index].question;
-    options.forEach((o,i)=>{
-        o.innerText = questions[index].options[i];
-        o.style.background="#eee";
-        o.onclick = ()=>check(o);
-    });
+function load(){
+ q.innerText=questions[i].q;
+ ops.forEach((d,j)=>{
+  d.innerText=questions[i].o[j];
+  d.className="option";
+  d.onclick=()=>check(d);
+ });
 }
 
-function check(selected){
-    options.forEach(o=>o.onclick=null);
-    if(selected.innerText === questions[index].answer){
-        selected.style.background="lightgreen";
-        score++;
-    } else {
-        selected.style.background="#ffb3b3";
-    }
+function check(el){
+ ops.forEach(d=>d.onclick=null);
+ if(el.innerText==questions[i].a){
+  el.classList.add("correct"); score++;
+ } else {
+  el.classList.add("wrong");
+ }
 }
 
-nextBtn.onclick = ()=>{
-    index++;
-    if(index < questions.length){
-        load();
-    } else {
-        q.innerText = "Test Finished 🎉 Score: "+score+"/"+questions.length;
-        options.forEach(o=>o.style.display="none");
-        nextBtn.style.display="none";
-    }
+function next(){
+ i++;
+ if(i<questions.length) load();
+ else {
+  q.innerText="Finished 🎉 Score "+score+"/"+questions.length;
+  ops.forEach(d=>d.style.display="none");
+ }
 }
 
 load();
 </script>
-
 </body>
 </html>
