@@ -1,23 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>MCQ PDF Test</title>
+    <title>MCQ Quiz</title>
 </head>
-<body style="text-align:center;margin-top:80px">
+<body>
 
-<h2>Upload MCQ PDF</h2>
+<h2>Upload MCQ PDFs</h2>
 
 <form method="post" enctype="multipart/form-data">
-<input type="file" name="mcq" required><br><br>
+    <p>MCQ PDF:
+        <input type="file" name="mcq" required>
+    </p>
 
-    <select name="count">
-        <option value="25">25 MCQs</option>
-        <option value="50">50 MCQs</option>
-        <option value="100">100 MCQs</option>
-        <option value="all">All MCQs</option>
-    </select><br><br>
+    <p>Answer Key PDF:
+        <input type="file" name="ans" required>
+    </p>
 
-    <button>Start Test</button>
+    <p>How many MCQ?
+        <select name="limit">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="all">ALL</option>
+        </select>
+    </p>
+
+    <button type="submit">Start Quiz</button>
 </form>
 
 </body>
