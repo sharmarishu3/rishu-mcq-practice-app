@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>MCQ Practice Test</title>
     <style>
         body {
             font-family: Arial;
             background: #f4f6f8;
         }
-        .box {
-            width: 400px;
+        #box {
+            width: 420px;
             background: white;
-            margin: 50px auto;
+            margin: 40px auto;
             padding: 20px;
             border-radius: 10px;
         }
         .option {
+            background: #eee;
             padding: 10px;
             margin: 8px 0;
-            background: #eee;
             cursor: pointer;
             border-radius: 5px;
         }
@@ -25,18 +26,18 @@
             width: 100%;
             padding: 10px;
             margin-top: 15px;
+            cursor: pointer;
         }
     </style>
 </head>
 
 <body>
-<div class="box">
-    <h3 id="qno"></h3>
-    <h2 id="question"></h2>
 
+<div id="box">
+    <h4 id="qno"></h4>
+    <h3 id="question"></h3>
     <div id="options"></div>
-
-    <button id="nextBtn">Next</button>
+    <button onclick="nextQuestion()">Next</button>
 </div>
 
 <script>
@@ -44,14 +45,15 @@ const questions = {{ questions | tojson }};
 
 let index = 0;
 let score = 0;
+let userAnswers = [];
 
 const qno = document.getElementById("qno");
 const question = document.getElementById("question");
 const optionsDiv = document.getElementById("options");
-const nextBtn = document.getElementById("nextBtn");
+const box = document.getElementById("box");
 
 function loadQuestion() {
-    qno.innerText = `Question ${index + 1} / ${questions.length}`;
+    qno.innerText = "Question " + (index + 1) + " / " + questions.length;
     question.innerText = questions[index].question;
     optionsDiv.innerHTML = "";
 
@@ -59,19 +61,17 @@ function loadQuestion() {
         let div = document.createElement("div");
         div.className = "option";
         div.innerText = opt;
-
         div.onclick = () => checkAnswer(div, opt);
         optionsDiv.appendChild(div);
     });
 }
 
 function checkAnswer(div, selected) {
-    let correct = questions[index].answer;
-    let all = document.querySelectorAll(".option");
+    if (userAnswers[index]) return;
 
-    all.forEach(o => o.onclick = null);
+    userAnswers[index] = selected;
 
-    if (selected === correct) {
+    if (selected === questions[index].answer) {
         div.style.background = "lightgreen";
         score++;
     } else {
@@ -79,21 +79,47 @@ function checkAnswer(div, selected) {
     }
 }
 
-nextBtn.onclick = () => {
+function nextQuestion() {
+    if (!userAnswers[index]) {
+        alert("Pehle answer select karo");
+        return;
+    }
+
     index++;
     if (index < questions.length) {
         loadQuestion();
     } else {
-        document.querySelector(".box").innerHTML = `
-            <h2>Test Finished 🎉</h2>
-            <h3>Score: ${score} / ${questions.length}</h3>
-            <h3>Percentage: ${Math.round((score/questions.length)*100)}%</h3>
-            <button onclick="location.reload()">Restart Test</button>
-        `;
+        showResult();
     }
-};
+}
+
+function showResult() {
+    let html = "<h2>Test Finished</h2>";
+    html += `<h3>Score: ${score} / ${questions.length}</h3>`;
+    html += "<hr>";
+
+    questions.forEach((q, i) => {
+        html += `<p><b>Q${i + 1}. ${q.question}</b></p>`;
+
+        q.options.forEach(opt => {
+            if (opt === q.answer) {
+                html += `<div style="color:green">✔ ${opt}</div>`;
+            } else if (opt === userAnswers[i]) {
+                html += `<div style="color:red">✖ ${opt}</div>`;
+            } else {
+                html += `<div>${opt}</div>`;
+            }
+        });
+
+        html += "<hr>";
+    });
+
+    html += `<button onclick="location.reload()">Restart Test</button>`;
+    box.innerHTML = html;
+}
 
 loadQuestion();
 </script>
+
 </body>
 </html>
