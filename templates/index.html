@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>First MCQ Extractor</title>
+    <title>MCQ PDF Reader</title>
 </head>
 <body>
 
@@ -9,20 +9,20 @@
 
 <form method="POST" enctype="multipart/form-data">
     <input type="file" name="pdf" required>
-    <button type="submit">Upload</button>
+    <button type="submit">Upload PDF</button>
 </form>
 
 <hr>
 
 {% if mcq %}
-    <h3>First Question</h3>
+    <h3>First MCQ</h3>
     <p><b>Q.</b> {{ mcq.question }}</p>
     <p>(a) {{ mcq.a }}</p>
     <p>(b) {{ mcq.b }}</p>
     <p>(c) {{ mcq.c }}</p>
     <p>(d) {{ mcq.d }}</p>
 {% else %}
-    <p>No MCQ found yet.</p>
+    <p>No MCQ extracted yet.</p>
 {% endif %}
 
 </body>
