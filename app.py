@@ -1,26 +1,26 @@
 from flask import Flask, render_template, request, redirect, session
 import os, random, re
-import pdfplumber
+from PyPDF2 import PdfReader
 
 app = Flask(__name__)
-app.secret_key = "final_mcq_secret_key"
+app.secret_key = "final_secret"
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def extract_mcqs(pdf_path):
+    reader = PdfReader(pdf_path)
     text = ""
-    with pdfplumber.open(pdf_path) as pdf:
-        for page in pdf.pages:
-            t = page.extract_text()
-            if t:
-                text += t + "\n"
+
+    for page in reader.pages:
+        t = page.extract_text()
+        if t:
+            text += t + "\n"
 
     lines = [l.strip() for l in text.split("\n") if l.strip()]
     mcqs = []
     answers = {}
 
-    # Answer key detect (safe)
     for line in lines:
         m = re.match(r"(\d+)\s*[:\.\-]?\s*([a-dA-D])$", line)
         if m:
@@ -28,10 +28,10 @@ def extract_mcqs(pdf_path):
 
     i = 0
     while i < len(lines):
-        q_match = re.match(r"(\d+)[\.\)]\s*(.+)", lines[i])
-        if q_match:
-            qno = q_match.group(1)
-            question = q_match.group(2)
+        q = re.match(r"(\d+)[\.\)]\s*(.+)", lines[i])
+        if q:
+            qno = q.group(1)
+            question = q.group(2)
             options = []
             j = i + 1
 
@@ -41,12 +41,12 @@ def extract_mcqs(pdf_path):
                 j += 1
 
             if len(options) == 4 and qno in answers:
-                correct_index = ord(answers[qno]) - ord("a")
-                if 0 <= correct_index < 4:
+                idx = ord(answers[qno]) - ord("a")
+                if 0 <= idx < 4:
                     mcqs.append({
                         "question": question,
                         "options": options,
-                        "answer": options[correct_index]
+                        "answer": options[idx]
                     })
             i = j
         else:
@@ -60,19 +60,14 @@ def upload():
         pdf = request.files.get("pdf")
         count = request.form.get("count")
 
-        if not pdf:
-            return "No PDF uploaded"
-
         path = os.path.join(UPLOAD_FOLDER, pdf.filename)
         pdf.save(path)
 
         mcqs = extract_mcqs(path)
-
-        if len(mcqs) == 0:
-            return "No MCQs found in this PDF. Please upload a valid MCQ PDF."
+        if not mcqs:
+            return "No MCQs found in PDF"
 
         random.shuffle(mcqs)
-
         if count != "all":
             mcqs = mcqs[:int(count)]
 
@@ -86,15 +81,14 @@ def upload():
 
 @app.route("/quiz", methods=["GET","POST"])
 def quiz():
-    if "mcqs" not in session:
+    mcqs = session.get("mcqs")
+    if not mcqs:
         return redirect("/")
 
-    mcqs = session["mcqs"]
     idx = session["index"]
 
     if request.method == "POST":
-        selected = request.form.get("option")
-        if selected == mcqs[idx]["answer"]:
+        if request.form["option"] == mcqs[idx]["answer"]:
             session["score"] += 1
         session["index"] += 1
         idx += 1
@@ -102,15 +96,13 @@ def quiz():
     if idx >= len(mcqs):
         total = len(mcqs)
         correct = session["score"]
-        wrong = total - correct
-        accuracy = round((correct/total)*100,2)
         return render_template(
             "quiz.html",
             finished=True,
-            correct=correct,
-            wrong=wrong,
             total=total,
-            accuracy=accuracy
+            correct=correct,
+            wrong=total-correct,
+            accuracy=round(correct*100/total,2)
         )
 
     return render_template(
