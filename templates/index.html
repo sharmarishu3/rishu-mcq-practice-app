@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>MCQ Practice Test</title>
+    <title>MCQ Practice</title>
     <style>
         body {
             font-family: Arial;
-            background: #f4f6f8;
+            background: #f4f4f4;
         }
-        #box {
-            width: 420px;
+        .box {
+            width: 400px;
             background: white;
-            margin: 40px auto;
+            margin: 50px auto;
             padding: 20px;
             border-radius: 10px;
         }
@@ -22,103 +21,71 @@
             cursor: pointer;
             border-radius: 5px;
         }
-        button {
+        .btn {
             width: 100%;
             padding: 10px;
-            margin-top: 15px;
+            margin-top: 10px;
             cursor: pointer;
         }
     </style>
 </head>
-
 <body>
 
-<div id="box">
-    <h4 id="qno"></h4>
-    <h3 id="question"></h3>
-    <div id="options"></div>
-    <button onclick="nextQuestion()">Next</button>
+<div class="box">
+    <h3 id="q"></h3>
+    <div id="opts"></div>
+    <button class="btn" id="nextBtn">Next</button>
+    <p id="result"></p>
 </div>
 
 <script>
-const questions = {{ questions | tojson }};
+    const questions = {{ questions | tojson }};
+    let index = 0;
+    let score = 0;
 
-let index = 0;
-let score = 0;
-let userAnswers = [];
+    const q = document.getElementById("q");
+    const opts = document.getElementById("opts");
+    const nextBtn = document.getElementById("nextBtn");
+    const result = document.getElementById("result");
 
-const qno = document.getElementById("qno");
-const question = document.getElementById("question");
-const optionsDiv = document.getElementById("options");
-const box = document.getElementById("box");
-
-function loadQuestion() {
-    qno.innerText = "Question " + (index + 1) + " / " + questions.length;
-    question.innerText = questions[index].question;
-    optionsDiv.innerHTML = "";
-
-    questions[index].options.forEach(opt => {
-        let div = document.createElement("div");
-        div.className = "option";
-        div.innerText = opt;
-        div.onclick = () => checkAnswer(div, opt);
-        optionsDiv.appendChild(div);
-    });
-}
-
-function checkAnswer(div, selected) {
-    if (userAnswers[index]) return;
-
-    userAnswers[index] = selected;
-
-    if (selected === questions[index].answer) {
-        div.style.background = "lightgreen";
-        score++;
-    } else {
-        div.style.background = "#ffb3b3";
-    }
-}
-
-function nextQuestion() {
-    if (!userAnswers[index]) {
-        alert("Pehle answer select karo");
-        return;
-    }
-
-    index++;
-    if (index < questions.length) {
-        loadQuestion();
-    } else {
-        showResult();
-    }
-}
-
-function showResult() {
-    let html = "<h2>Test Finished</h2>";
-    html += `<h3>Score: ${score} / ${questions.length}</h3>`;
-    html += "<hr>";
-
-    questions.forEach((q, i) => {
-        html += `<p><b>Q${i + 1}. ${q.question}</b></p>`;
-
-        q.options.forEach(opt => {
-            if (opt === q.answer) {
-                html += `<div style="color:green">✔ ${opt}</div>`;
-            } else if (opt === userAnswers[i]) {
-                html += `<div style="color:red">✖ ${opt}</div>`;
-            } else {
-                html += `<div>${opt}</div>`;
-            }
+    function loadQuestion() {
+        q.innerText = (index + 1) + ". " + questions[index].question;
+        opts.innerHTML = "";
+        questions[index].options.forEach(opt => {
+            const div = document.createElement("div");
+            div.className = "option";
+            div.innerText = opt;
+            div.onclick = () => checkAnswer(div, opt);
+            opts.appendChild(div);
         });
+    }
 
-        html += "<hr>";
-    });
+    function checkAnswer(div, opt) {
+        if (opt === questions[index].answer) {
+            div.style.background = "lightgreen";
+            score++;
+        } else {
+            div.style.background = "#ffb3b3";
+        }
+        document.querySelectorAll(".option").forEach(o => o.onclick = null);
+    }
 
-    html += `<button onclick="location.reload()">Restart Test</button>`;
-    box.innerHTML = html;
-}
+    nextBtn.onclick = () => {
+        index++;
+        if (index < questions.length) {
+            loadQuestion();
+        } else {
+            q.innerText = "Test Finished";
+            opts.innerHTML = "";
+            result.innerText =
+                "Score: " + score + "/" + questions.length +
+                " (" + Math.round((score / questions.length) * 100) + "%)";
+            nextBtn.innerText = "Restart";
+            nextBtn.onclick = () => location.reload();
+        }
+    };
 
-loadQuestion();
+    loadQuestion();
 </script>
 
 </body>
