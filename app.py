@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, jsonify
 import pdfplumber
 import re
 import random
-import pytesseract
 
 app = Flask(__name__)
 
