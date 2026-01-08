@@ -1,118 +1,59 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, url_for
 import os
-import random
-from PyPDF2 import PdfReader
+import pdfplumber
 
 app = Flask(__name__)
-app.secret_key = "mcq_secret_key"
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-# -------- PDF MCQ EXTRACT (BASIC) --------
-def extract_mcqs_from_pdf(filepath):
-    reader = PdfReader(filepath)
+# Temporary MCQs (jab tak PDF se auto extract nahi karte)
+questions = [
+    {
+        "question": "भारत की राजधानी क्या है?",
+        "options": ["दिल्ली", "मुंबई", "चेन्नई", "कोलकाता"],
+        "answer": "दिल्ली"
+    },
+    {
+        "question": "गुजरात की राजधानी क्या है?",
+        "options": ["सूरत", "राजकोट", "गांधीनगर", "अहमदाबाद"],
+        "answer": "गांधीनगर"
+    },
+    {
+        "question": "20वीं सदी का सबसे बड़ा युद्ध कौन सा था?",
+        "options": ["प्रथम विश्व युद्ध", "द्वितीय विश्व युद्ध", "शीत युद्ध", "कोई नहीं"],
+        "answer": "द्वितीय विश्व युद्ध"
+    }
+]
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+@app.route("/upload", methods=["POST"])
+def upload_pdf():
+    pdf = request.files.get("pdf")
+    if not pdf:
+        return "No PDF uploaded"
+
+    path = os.path.join(app.config["UPLOAD_FOLDER"], pdf.filename)
+    pdf.save(path)
+
+    # PDF text read (Phase 2 base)
     text = ""
+    with pdfplumber.open(path) as pdf_file:
+        for page in pdf_file.pages:
+            t = page.extract_text()
+            if t:
+                text += t + "\n"
 
-    for page in reader.pages:
-        text += page.extract_text() + "\n"
+    # Abhi sirf test ke liye MCQ dikha rahe
+    return redirect(url_for("quiz"))
 
-    lines = [l.strip() for l in text.split("\n") if l.strip()]
-
-    mcqs = []
-    i = 0
-    while i < len(lines) - 5:
-        if lines[i][0].isdigit() and "." in lines[i]:
-            question = lines[i]
-            options = lines[i+1:i+5]
-
-            if all(o.startswith(("a", "b", "c", "d", "(")) for o in options):
-                mcqs.append({
-                    "question": question,
-                    "options": options,
-                    "answer": options[0]  # TEMP (answer key later)
-                })
-                i += 5
-            else:
-                i += 1
-        else:
-            i += 1
-
-    return mcqs
-
-# -------- ROUTES --------
-
-@app.route("/", methods=["GET", "POST"])
-def upload():
-    if request.method == "POST":
-        pdf = request.files["pdf"]
-        if not pdf:
-            return "No file uploaded"
-
-        path = os.path.join(UPLOAD_FOLDER, pdf.filename)
-        pdf.save(path)
-
-        mcqs = extract_mcqs_from_pdf(path)
-
-        session["all_mcqs"] = mcqs
-        return redirect("/start")
-
-    return render_template("upload.html")
-
-
-@app.route("/start", methods=["GET", "POST"])
-def start():
-    if request.method == "POST":
-        count = int(request.form["count"])
-        mcqs = session.get("all_mcqs", [])
-
-        random.shuffle(mcqs)
-        session["quiz"] = mcqs[:count]
-        session["index"] = 0
-        session["score"] = 0
-
-        return redirect("/quiz")
-
-    return render_template("upload.html", step="select")
-
-
-@app.route("/quiz", methods=["GET", "POST"])
+@app.route("/quiz")
 def quiz():
-    quiz = session.get("quiz", [])
-    index = session.get("index", 0)
-
-    if index >= len(quiz):
-        return render_template(
-            "quiz.html",
-            finished=True,
-            score=session["score"],
-            total=len(quiz)
-        )
-
-    if request.method == "POST":
-        selected = request.form.get("option")
-        correct = quiz[index]["answer"]
-
-        if selected == correct:
-            session["score"] += 1
-
-        session["index"] += 1
-        return redirect("/quiz")
-
-    return render_template(
-        "quiz.html",
-        q=quiz[index],
-        index=index + 1,
-        total=len(quiz),
-        finished=False
-    )
-
-
-@app.route("/restart")
-def restart():
-    session.clear()
-    return redirect("/")
-
+    return render_template("quiz.html", questions=questions)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
