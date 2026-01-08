@@ -1,58 +1,117 @@
-from flask import Flask, render_template, request
-import pdfplumber
+from flask import Flask, render_template, request, redirect, session
 import os
-import re
+import random
+from PyPDF2 import PdfReader
 
 app = Flask(__name__)
+app.secret_key = "mcq_secret_key"
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-
-def extract_first_mcq(pdf_path):
+# -------- PDF MCQ EXTRACT (BASIC) --------
+def extract_mcqs_from_pdf(filepath):
+    reader = PdfReader(filepath)
     text = ""
 
-    with pdfplumber.open(pdf_path) as pdf:
-        for page in pdf.pages:
-            page_text = page.extract_text()
-            if page_text:
-                text += page_text + "\n"
+    for page in reader.pages:
+        text += page.extract_text() + "\n"
 
-    pattern = re.compile(
-        r"\d+\.\s*(.*?)\n"
-        r"\(a\)\s*(.*?)\n"
-        r"\(b\)\s*(.*?)\n"
-        r"\(c\)\s*(.*?)\n"
-        r"\(d\)\s*(.*?)\n",
-        re.DOTALL
-    )
+    lines = [l.strip() for l in text.split("\n") if l.strip()]
 
-    match = pattern.search(text)
+    mcqs = []
+    i = 0
+    while i < len(lines) - 5:
+        if lines[i][0].isdigit() and "." in lines[i]:
+            question = lines[i]
+            options = lines[i+1:i+5]
 
-    if match:
-        return {
-            "question": match.group(1).strip(),
-            "a": match.group(2).strip(),
-            "b": match.group(3).strip(),
-            "c": match.group(4).strip(),
-            "d": match.group(5).strip(),
-        }
+            if all(o.startswith(("a", "b", "c", "d", "(")) for o in options):
+                mcqs.append({
+                    "question": question,
+                    "options": options,
+                    "answer": options[0]  # TEMP (answer key later)
+                })
+                i += 5
+            else:
+                i += 1
+        else:
+            i += 1
 
-    return None
+    return mcqs
 
+# -------- ROUTES --------
 
 @app.route("/", methods=["GET", "POST"])
-def index():
-    mcq = None
+def upload():
+    if request.method == "POST":
+        pdf = request.files["pdf"]
+        if not pdf:
+            return "No file uploaded"
+
+        path = os.path.join(UPLOAD_FOLDER, pdf.filename)
+        pdf.save(path)
+
+        mcqs = extract_mcqs_from_pdf(path)
+
+        session["all_mcqs"] = mcqs
+        return redirect("/start")
+
+    return render_template("upload.html")
+
+
+@app.route("/start", methods=["GET", "POST"])
+def start():
+    if request.method == "POST":
+        count = int(request.form["count"])
+        mcqs = session.get("all_mcqs", [])
+
+        random.shuffle(mcqs)
+        session["quiz"] = mcqs[:count]
+        session["index"] = 0
+        session["score"] = 0
+
+        return redirect("/quiz")
+
+    return render_template("upload.html", step="select")
+
+
+@app.route("/quiz", methods=["GET", "POST"])
+def quiz():
+    quiz = session.get("quiz", [])
+    index = session.get("index", 0)
+
+    if index >= len(quiz):
+        return render_template(
+            "quiz.html",
+            finished=True,
+            score=session["score"],
+            total=len(quiz)
+        )
 
     if request.method == "POST":
-        pdf = request.files.get("pdf")
-        if pdf:
-            file_path = os.path.join(UPLOAD_FOLDER, pdf.filename)
-            pdf.save(file_path)
-            mcq = extract_first_mcq(file_path)
+        selected = request.form.get("option")
+        correct = quiz[index]["answer"]
 
-    return render_template("index.html", mcq=mcq)
+        if selected == correct:
+            session["score"] += 1
+
+        session["index"] += 1
+        return redirect("/quiz")
+
+    return render_template(
+        "quiz.html",
+        q=quiz[index],
+        index=index + 1,
+        total=len(quiz),
+        finished=False
+    )
+
+
+@app.route("/restart")
+def restart():
+    session.clear()
+    return redirect("/")
 
 
 if __name__ == "__main__":
